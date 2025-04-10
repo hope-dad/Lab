@@ -24,17 +24,39 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+    // MapStruct: DTO ↔ Entity 변환 매퍼
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // JPA & Hibernate
+    implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean validation (JSR-380)
+    implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring MVC (REST API)
+
+    // Lombok: boilerplate 코드 생략 (getter/setter 등)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 개발 편의 기능 (자동 재시작 등)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // 테스트 관련 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'       // JUnit, Mockito 등 포함
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit 플랫폼 실행기
+
+    // DB 드라이버
+    runtimeOnly 'org.postgresql:postgresql'                                      // PostgreSQL
+    runtimeOnly 'com.h2database:h2'                                              // H2 (테스트용 인메모리 DB)
+}
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    jvmArgs += [
+            "-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"
+    ]
+}
+test {
+    jvmArgs "-javaagent:path/to/mockito-inline.jar" // 실제 jar 경로로 수정
 }
